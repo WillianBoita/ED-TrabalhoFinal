@@ -17,3 +17,17 @@ typedef struct {
   struct Arvore *left, *right;
 } Arvore;
 
+void cadastro(char opcao, Arvore *root);
+
+void consulta(char opcao, Arvore *root);
+
+void atualizacao(char opcao, Arvore *root);
+
+void exclusao(char opcao, Arvore *root);
+
+void emprestimo(int codigo, char *email, Arvore *root);
+
+void devolucao(int codigo, Arvore *root);
+
+void sair();
+
