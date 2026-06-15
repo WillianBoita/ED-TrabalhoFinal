@@ -6,7 +6,7 @@ typedef struct {
 typedef struct {
   char *titulo;
   char *autor;
-  char *anoPublicacao;
+  int anoPublicacao;
   int codigo;
   char *status;
   char *emailUsuario;

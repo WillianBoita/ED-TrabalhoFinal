@@ -31,7 +31,33 @@ void cadastrarUsuario(ArvoreUsuario *rootUsuario){
 }
 
 void cadastrarLivro(ArvoreLivro *rootLivro){
+  Livro *novoLivro = (Livro*) malloc(sizeof(Livro));
+  char titulo[20], autor[20];
+  int codigo, anoPublicacao;
 
+  printf("Informe o titulo do livro: ");
+  scanf("%s", titulo);
+
+  printf("Informe o autor do livro: ");
+  scanf("%s", autor);
+
+  printf("Informe o ano de publicação do livro: ");
+  scanf("%d", &anoPublicacao);
+
+  printf("Informe o código do livro: ");
+  scanf("%d", &codigo);
+
+  novoLivro->titulo = titulo;
+  novoLivro->autor = autor;
+  novoLivro->anoPublicacao = anoPublicacao;
+  novoLivro->codigo = codigo;
+  novoLivro->status = "Disponível";
+
+  printf("Título: %s\n", novoLivro->titulo);
+  printf("Autor: %s\n", novoLivro->autor);
+  printf("Ano: %d\n", novoLivro->anoPublicacao);
+  printf("Código: %d\n", novoLivro->codigo);
+  printf("Status: %s\n", novoLivro->status);
 }
 
 int main() {
