@@ -3,70 +3,122 @@
 #include <stdlib.h>
 #include "structs.h"
 
-void cadastro(char opcao, ArvoreLivro *rootLivro, ArvoreUsuario *rootUsuario) {
-  if (opcao == '0') return;
-  if (opcao == '1') {
-    cadastrarLivro(rootLivro);
-  }
-  if (opcao == '2') {
-    cadastrarUsuario(rootUsuario);
+void cadastro(NodeLivro *rootLivro, NodeUsuario *rootUsuario) {
+  char opcao;
+  printf("\n1. Livros\n2. Usuários\n3. Empréstimos\n0. Sair\n");
+  scanf(" %c", &opcao);
+
+  switch (opcao) {
+    case '1':
+      rootLivro = cadastrarLivro(rootLivro);
+      break;
+    case '2':
+      
+      break;
+    case '3':
+      
+      break;
+    
+    
+    default:
+      menu(rootUsuario, rootLivro);
+      break;
   }
 }
 
-void cadastrarUsuario(ArvoreUsuario *rootUsuario){
-  Usuario *novoUsuario = (Usuario*) malloc(sizeof(Usuario));
-  char nome[20], email[20];
+NodeLivro* cadastrarLivro(NodeLivro *rootLivro){
+  NodeLivro *node = (NodeLivro*) malloc(sizeof(NodeLivro));
 
-  printf("Informe o nome do usuário: ");
-  scanf("%s", nome);
+  node->livro = criarLivro();
+  node->left = NULL;
+  node->right = NULL;
 
-  printf("Informe o email do usuário: ");
-  scanf("%s", email);
+  rootLivro = node;
 
-  novoUsuario->nome = nome;
-  novoUsuario->email = email;
-
-  printf("Nome: %s\n", novoUsuario->nome);
-  printf("Email: %s\n", novoUsuario->email);
+  return rootLivro;
 }
 
-void cadastrarLivro(ArvoreLivro *rootLivro){
-  Livro *novoLivro = (Livro*) malloc(sizeof(Livro));
-  char titulo[20], autor[20];
-  int codigo, anoPublicacao;
+Livro criarLivro() {
+  Livro novoLivro;
 
   printf("Informe o titulo do livro: ");
-  scanf("%s", titulo);
+  scanf("%s", novoLivro.titulo);
 
   printf("Informe o autor do livro: ");
-  scanf("%s", autor);
-
+  scanf("%s", novoLivro.autor);
+  
   printf("Informe o ano de publicação do livro: ");
-  scanf("%d", &anoPublicacao);
-
+  scanf("%d", &novoLivro.anoPublicacao);
+  
   printf("Informe o código do livro: ");
-  scanf("%d", &codigo);
+  scanf("%d", &novoLivro.codigo);
 
-  novoLivro->titulo = titulo;
-  novoLivro->autor = autor;
-  novoLivro->anoPublicacao = anoPublicacao;
-  novoLivro->codigo = codigo;
-  novoLivro->status = "Disponível";
+  strcpy(novoLivro.status, "Disponível");
 
-  printf("Título: %s\n", novoLivro->titulo);
-  printf("Autor: %s\n", novoLivro->autor);
-  printf("Ano: %d\n", novoLivro->anoPublicacao);
-  printf("Código: %d\n", novoLivro->codigo);
-  printf("Status: %s\n", novoLivro->status);
+  strcpy(novoLivro.emailUsuario, "");
+
+  return novoLivro;
+}
+
+
+/*NodeLivro* encontrarLivro(NodeLivro *rootLivro, Livro livroBusca) {
+  if (rootLivro == NULL) {
+    return rootLivro;
+  }
+
+  if (rootLivro->livro.codigo == livroBusca.codigo) {
+    printf("%d", rootLivro->livro.codigo);
+    return rootLivro;
+  }
+  
+  encontrarLivro(rootLivro->left, livroBusca);
+  encontrarLivro(rootLivro->right, livroBusca);
+}*/
+
+void menu(NodeUsuario *usuarios, NodeLivro *livros) {
+  char opcao;
+  printf("\n1. Cadastro\n2. Consulta\n3. Atualização\n4. Exclusão\n5. Empréstimo\n6. Devolução\n0. Sair\n");
+  scanf(" %c", &opcao);
+
+  switch (opcao) {
+    case '1':
+      cadastro(livros, usuarios);
+      break;
+    case '2':
+      
+      break;
+    case '3':
+      
+      break;
+    case '4':
+      
+      break;
+    case '5':
+      
+      break;
+    case '6':
+      
+      break;
+    
+    
+    default:
+      return;
+      break;
+  }
+  
+  cadastro(livros, usuarios);
 }
 
 int main() {
-  ArvoreUsuario *usuarios;
-  ArvoreLivro *livros;
-  char opcao;
+  NodeUsuario *usuarios = (NodeUsuario*) malloc(sizeof(NodeUsuario));
+  NodeLivro *livros = (NodeLivro*) malloc(sizeof(NodeLivro));
 
-  scanf("%c", &opcao);
-  cadastro(opcao, livros, usuarios);
+  livros->left = NULL;
+  livros->right = NULL;
 
+  usuarios->left = NULL;
+  usuarios->right = NULL;
+
+  menu(usuarios, livros);
   return 0;
 }

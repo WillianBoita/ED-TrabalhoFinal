@@ -1,42 +1,50 @@
-typedef struct {
+typedef struct Usuario {
   char *nome;
   char *email;
 } Usuario;
 
-typedef struct {
-  char *titulo;
-  char *autor;
+typedef struct Livro {
+  char titulo[20];
+  char autor[20];
   int anoPublicacao;
   int codigo;
-  char *status;
-  char *emailUsuario;
+  char status[12];
+  char emailUsuario[40];
 } Livro;
 
-typedef struct {
+typedef struct NodeLivro {
   Livro livro;
-  struct ArvoreLivro *left, *right;
-} ArvoreLivro;
+  struct NodeLivro *left, *right;
+} NodeLivro;
 
-typedef struct {
+typedef struct NodeUsuario {
   Usuario usuario;
-  struct ArvoreUsuario *left, *right;
-} ArvoreUsuario;
+  struct NodeUsuario *left, *right;
+} NodeUsuario;
 
-void cadastro(char opcao, ArvoreLivro *rootLivro, ArvoreUsuario *rootUsuario);
+void cadastro(NodeLivro *rootLivro, NodeUsuario *rootUsuario);
 
-void cadastrarUsuario(ArvoreUsuario *rootUsuario);
+void cadastrarUsuario(NodeUsuario *rootUsuario);
 
-void cadastrarLivro(ArvoreLivro *rootLivro);
+NodeLivro* cadastrarLivro(NodeLivro *rootLivro);
 
-void consulta(char opcao, ArvoreLivro *root);
+Livro criarLivro();
 
-void atualizacao(char opcao, ArvoreLivro *root);
+NodeLivro* encontrarLivro(NodeLivro *rootLivro, Livro novoLivro);
 
-void exclusao(char opcao, ArvoreLivro *root);
+NodeUsuario* encontrarUsuario(NodeUsuario *rootUsuario, Usuario novoUsuario);
 
-void emprestimo(int codigo, char *email, ArvoreLivro *root);
+void menu(NodeUsuario *usuarios, NodeLivro *livros);
 
-void devolucao(int codigo, ArvoreLivro *root);
+void consulta(char opcao, NodeLivro *root);
+
+void atualizacao(char opcao, NodeLivro *root);
+
+void exclusao(char opcao, NodeLivro *root);
+
+void emprestimo(int codigo, char *email, NodeLivro *root);
+
+void devolucao(int codigo, NodeLivro *root);
 
 void sair();
 
