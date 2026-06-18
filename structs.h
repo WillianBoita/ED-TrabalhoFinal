@@ -8,7 +8,7 @@ typedef struct Livro {
   char autor[20];
   int anoPublicacao;
   int codigo;
-  char status[12];
+  int status;
   char emailUsuario[40];
 } Livro;
 
@@ -22,29 +22,32 @@ typedef struct NodeUsuario {
   struct NodeUsuario *left, *right;
 } NodeUsuario;
 
-void cadastro(NodeLivro *rootLivro, NodeUsuario *rootUsuario);
+typedef struct Arvores {
+  NodeUsuario *usuarios;
+  NodeLivro *livros;
+} Arvores;
+
+void cadastro(Arvores *trees, int *codigo);
 
 void cadastrarUsuario(NodeUsuario *rootUsuario);
 
-NodeLivro* cadastrarLivro(NodeLivro *rootLivro);
+NodeLivro* cadastrarLivro(NodeLivro *rootLivro, int *codigo);
 
-Livro criarLivro();
+Livro criarLivro(int *codigo);
 
-NodeLivro* encontrarLivro(NodeLivro *rootLivro, Livro novoLivro);
+NodeLivro* encontrarLivro(NodeLivro *rootLivro);
 
 NodeUsuario* encontrarUsuario(NodeUsuario *rootUsuario, Usuario novoUsuario);
 
-void menu(NodeUsuario *usuarios, NodeLivro *livros);
+void menu(Arvores *trees, int *codigo);
 
-void consulta(char opcao, NodeLivro *root);
+void consulta(NodeLivro *root);
 
-void atualizacao(char opcao, NodeLivro *root);
+void atualizacao(NodeLivro *root);
 
-void exclusao(char opcao, NodeLivro *root);
+void exclusao(NodeLivro *root);
 
 void emprestimo(int codigo, char *email, NodeLivro *root);
 
 void devolucao(int codigo, NodeLivro *root);
-
-void sair();
 
