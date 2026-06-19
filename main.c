@@ -1,7 +1,185 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "structs.h"
+#include "livro.h"
+#include "usuario.h"
+#include "arvores.h"
+
+// Funções AVL com LLM
+
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+int alturaLivro(NodeLivro *n) {
+    return n ? n->altura : 0;
+}
+
+int alturaUsuario(NodeUsuario *n) {
+    return n ? n->altura : 0;
+}
+
+int fatorBalanceamentoLivro(NodeLivro *n) {
+    if (n == NULL)
+        return 0;
+
+    return alturaLivro(n->left) - alturaLivro(n->right);
+}
+
+int fatorBalanceamentoUsuario(NodeUsuario *n) {
+    if (n == NULL)
+        return 0;
+
+    return alturaUsuario(n->left) - alturaUsuario(n->right);
+}
+
+NodeLivro *rotacaoDireitaLivro(NodeLivro *y) {
+    NodeLivro *x = y->left;
+    NodeLivro *t2 = x->right;
+
+    x->right = y;
+    y->left = t2;
+
+    y->altura = 1 + max(
+        alturaLivro(y->left),
+        alturaLivro(y->right)
+    );
+
+    x->altura = 1 + max(
+        alturaLivro(x->left),
+        alturaLivro(x->right)
+    );
+
+    return x;
+}
+
+NodeLivro *rotacaoEsquerdaLivro(NodeLivro *x) {
+    NodeLivro *y = x->right;
+    NodeLivro *t2 = y->left;
+
+    y->left = x;
+    x->right = t2;
+
+    x->altura = 1 + max(
+        alturaLivro(x->left),
+        alturaLivro(x->right)
+    );
+
+    y->altura = 1 + max(
+        alturaLivro(y->left),
+        alturaLivro(y->right)
+    );
+
+    return y;
+}
+
+NodeLivro *balancearLivro(NodeLivro *raiz) {
+    if (raiz == NULL)
+        return NULL;
+
+    raiz->altura = 1 + max(
+        alturaLivro(raiz->left),
+        alturaLivro(raiz->right)
+    );
+
+    int fb = fatorBalanceamentoLivro(raiz);
+
+    // LL
+    if (fb > 1 &&
+        fatorBalanceamentoLivro(raiz->left) >= 0)
+        return rotacaoDireitaLivro(raiz);
+
+    // RR
+    if (fb < -1 &&
+        fatorBalanceamentoLivro(raiz->right) <= 0)
+        return rotacaoEsquerdaLivro(raiz);
+
+    // LR
+    if (fb > 1 &&
+        fatorBalanceamentoLivro(raiz->left) < 0) {
+
+        raiz->left =
+            rotacaoEsquerdaLivro(raiz->left);
+
+        return rotacaoDireitaLivro(raiz);
+    }
+
+    // RL
+    if (fb < -1 &&
+        fatorBalanceamentoLivro(raiz->right) > 0) {
+
+        raiz->right =
+            rotacaoDireitaLivro(raiz->right);
+
+        return rotacaoEsquerdaLivro(raiz);
+    }
+
+    return raiz;
+}
+
+NodeUsuario *rotacaoEsquerdaUsuario(NodeUsuario *x) {
+    NodeUsuario *y = x->right;
+    NodeUsuario *t2 = y->left;
+
+    y->left = x;
+    x->right = t2;
+
+    x->altura = 1 + max(
+        alturaUsuario(x->left),
+        alturaUsuario(x->right)
+    );
+
+    y->altura = 1 + max(
+        alturaUsuario(y->left),
+        alturaUsuario(y->right)
+    );
+
+    return y;
+}
+
+NodeUsuario *balancearUsuario(NodeUsuario *raiz) {
+    if (raiz == NULL)
+        return NULL;
+
+    raiz->altura = 1 + max(
+        alturaUsuario(raiz->left),
+        alturaUsuario(raiz->right)
+    );
+
+    int fb = fatorBalanceamentoUsuario(raiz);
+
+    // LL
+    if (fb > 1 &&
+        fatorBalanceamentoUsuario(raiz->left) >= 0)
+        return rotacaoDireitaUsuario(raiz);
+
+    // RR
+    if (fb < -1 &&
+        fatorBalanceamentoUsuario(raiz->right) <= 0)
+        return rotacaoEsquerdaUsuario(raiz);
+
+    // LR
+    if (fb > 1 &&
+        fatorBalanceamentoUsuario(raiz->left) < 0) {
+
+        raiz->left =
+            rotacaoEsquerdaUsuario(raiz->left);
+
+        return rotacaoDireitaUsuario(raiz);
+    }
+
+    // RL
+    if (fb < -1 &&
+        fatorBalanceamentoUsuario(raiz->right) > 0) {
+
+        raiz->right =
+            rotacaoDireitaUsuario(raiz->right);
+
+        return rotacaoEsquerdaUsuario(raiz);
+    }
+
+    return raiz;
+}
 
 void cadastro(Arvores *trees, int *codigo) {
   char opcao;
@@ -10,40 +188,39 @@ void cadastro(Arvores *trees, int *codigo) {
 
   switch (opcao) {
     case '1':
-      trees->livros = cadastrarLivro(trees->livros, codigo);
+      NodeLivro *nodeLivro = (NodeLivro*) malloc(sizeof(NodeLivro));
+
+      nodeLivro->livro = criarLivro(codigo);
+      nodeLivro->left = NULL;
+      nodeLivro->right = NULL;
+
+      if (trees->livros == NULL){
+        trees->livros = nodeLivro;
+      } else if(trees->livros->livro.codigo <= nodeLivro->livro.codigo){
+        trees->livros->right = nodeLivro;
+      } else {
+        trees->livros->left = nodeLivro;
+      }
       break;
     case '2':
-      
-      break;
-    case '3':
-      
-      break;
-    
-    
+      NodeUsuario *nodeUsuario = (NodeUsuario*) malloc(sizeof(NodeUsuario));
+
+      nodeUsuario->usuario = criarUsuario(codigo);
+      nodeUsuario->left = NULL;
+      nodeUsuario->right = NULL;
+
+      if (trees->usuarios == NULL){
+        trees->usuarios = nodeUsuario;
+      } else if(trees->usuarios->usuario.email <= nodeUsuario->usuario.email){
+        trees->usuarios->right = nodeUsuario;
+      } else {
+        trees->usuarios->left = nodeUsuario;
+      }
+      break;  
     default:
       menu(trees, codigo);
       break;
   }
-
-  menu(trees, codigo);
-}
-
-NodeLivro* cadastrarLivro(NodeLivro *rootLivro, int *codigo){
-  NodeLivro *node = (NodeLivro*) malloc(sizeof(NodeLivro));
-
-  node->livro = criarLivro(codigo);
-  node->left = NULL;
-  node->right = NULL;
-
-  if (rootLivro == NULL){
-    rootLivro = node;
-  } else if(rootLivro->livro.codigo <= node->livro.codigo){
-    rootLivro->right = node;
-  } else {
-    rootLivro->left = node;
-  }
-  
-  return rootLivro;
 }
 
 Livro criarLivro(int *codigo) {
@@ -68,17 +245,76 @@ Livro criarLivro(int *codigo) {
   return novoLivro;
 }
 
+Usuario criarUsuario() {
+  Usuario novoUsuario;
 
-NodeLivro* encontrarLivro(NodeLivro *rootLivro) {
-  if (rootLivro == NULL) {
-    return rootLivro;
+  printf("Informe o nome do Usuario: ");
+  scanf("%s", novoUsuario.nome);
+
+  printf("Informe o email do Usuario: ");
+  scanf("%s", novoUsuario.email);
+
+  return novoUsuario;
+}
+
+void consulta(Arvores *trees, int *codigo) {
+  char opcao;
+  printf("\n1. Livros\n2. Usuários\n3. Empréstimos\n0. Sair\n");
+  scanf(" %c", &opcao);
+
+  switch (opcao) {
+    case '1':
+
+      char busca;
+      printf("\n1. Por Código\n2. Por Autor\n0. Sair\n");
+      scanf(" %c", &busca);
+
+      switch (busca) {
+      case '1':
+        int buscaCodigo;
+        printf("\ncódigo para buscar: ");
+        scanf("%d", &buscaCodigo);
+        
+        NodeLivro *livro = buscarLivroPorCodigo(trees->livros, buscaCodigo);
+        if (livro == NULL) {
+          printf("\nLivro não encontrado.");
+        } else {
+          printf("%s\n", livro->livro.titulo);
+          printf("%s\n", livro->livro.autor);
+          printf("%d\n", livro->livro.codigo);
+        }
+        
+        break;
+      
+      default:
+        break;
+      }
+
+      break;
+    case '2':
+      break;
+    case '3':
+      
+      break;
+    
+    
+    default:
+      menu(trees, codigo);
+      break;
   }
-  
-  
-  printf("%d\n", rootLivro->livro.codigo);
-  printf("%s\n", rootLivro->livro.titulo);
-  encontrarLivro(rootLivro->left);
-  encontrarLivro(rootLivro->right);
+
+  menu(trees, codigo);
+}
+
+NodeLivro* buscarLivroPorCodigo(NodeLivro* livros, int codigo) {
+  if ((livros->left == NULL && livros->right == NULL) || livros->livro.codigo == codigo || livros == NULL) {
+    return livros;
+  }
+
+  buscarLivroPorCodigo(livros->left, codigo);
+  printf("\nesquerda");
+  buscarLivroPorCodigo(livros->right, codigo);
+  printf("\ndireita");
 
   return NULL;
 }
@@ -93,7 +329,7 @@ void menu(Arvores *trees, int *codigo) {
       cadastro(trees, codigo);
       break;
     case '2':
-      encontrarLivro(trees->livros);
+      consulta(trees, codigo);
       break;
     case '3':
       
