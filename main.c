@@ -222,7 +222,41 @@ NodeLivro *inserirLivro(NodeLivro* rootLivro, Livro livro) {
     return rootLivro;
   }
 
-  return balancearLivro(rootLivro);
+  return balancearLivro(rootLivro); //Balanceando árvore após adicionar livro novo, foi utilizado as funções AVL feitas por LLM
+}
+
+NodeUsuario *inserirUsuario(NodeUsuario* rootUsuario, Usuario usuario) {
+  if (rootUsuario == NULL){
+    NodeUsuario *nodeUsuario = (NodeUsuario*) malloc(sizeof(NodeUsuario));
+
+    nodeUsuario->usuario = usuario;
+    nodeUsuario->left = NULL;
+    nodeUsuario->right = NULL;
+    nodeUsuario->altura = 1;
+
+    rootUsuario = nodeUsuario;
+
+  } else if(strcmp(rootUsuario->usuario.email, usuario.email) <= 0){
+    rootUsuario->right = inserirUsuario(rootUsuario->right, usuario);
+  } else if(strcmp(rootUsuario->usuario.email, usuario.email) > 0){
+    rootUsuario->left = inserirUsuario(rootUsuario->left, usuario);
+  } else {
+    return rootUsuario;
+  }
+
+  return balancearUsuario(rootUsuario); //Balanceando árvore após adicionar usuario novo, foi utilizado as funções AVL feitas por LLM
+}
+
+int compString(char* e1, char* e2){
+  int flag = 0;
+  if (strcmp(e1, e2) != 0) return 1;
+  for (int i = 0; i < strlen(e1); i++) {
+    if (e1[i] != e2[i]) {
+      flag = 1;
+    }
+  }
+
+  return flag;
 }
 
 void cadastro(Arvores *trees, int *codigo) {
@@ -236,19 +270,12 @@ void cadastro(Arvores *trees, int *codigo) {
       trees->livros = inserirLivro(trees->livros, novoLivro);
       break;
     case '2':
-      NodeUsuario *nodeUsuario = (NodeUsuario*) malloc(sizeof(NodeUsuario));
-
-      nodeUsuario->usuario = criarUsuario();
-      nodeUsuario->left = NULL;
-      nodeUsuario->right = NULL;
-
-      if (trees->usuarios == NULL){
-        trees->usuarios = nodeUsuario;
-      } else if(trees->usuarios->usuario.email <= nodeUsuario->usuario.email){
-        trees->usuarios->right = nodeUsuario;
-      } else {
-        trees->usuarios->left = nodeUsuario;
+      Usuario novoUsuario = criarUsuario();
+      if (buscarUsuarioPorEmail(trees->usuarios, novoUsuario.email) || buscarUsuarioPorNome(trees->usuarios, novoUsuario.nome)) {
+        printf("\nUm usuário com esse nome/email já existe.");
+        break;
       }
+      trees->usuarios = inserirUsuario(trees->usuarios, novoUsuario);
       break;
     case '0':
       return;
@@ -323,7 +350,35 @@ NodeLivro* buscarLivroPorAutor(NodeLivro* livros, char *autor) {
     printf("Ano de Publicação: %d\n", livros->livro.anoPublicacao);
     printf("Status (0: Disponível, 1: Emprestado): %d\n", livros->livro.status);
   }
-  return livros;
+  return !compString(livros->livro.autor, autor) ? livros : NULL;
+}
+
+NodeUsuario* buscarUsuarioPorNome(NodeUsuario* usuarios, char *nome) {
+  if (usuarios == NULL) {
+    return NULL;
+  }
+  
+  buscarUsuarioPorNome(usuarios->left, nome);
+  buscarUsuarioPorNome(usuarios->right, nome);
+  if (!strcmp(nome, usuarios->usuario.nome)) {
+    printf("\nNome: %s\n", usuarios->usuario.nome);
+    printf("Email: %s\n", usuarios->usuario.email);
+  }
+  return !compString(usuarios->usuario.nome, nome) ? usuarios : NULL;
+}
+
+NodeUsuario* buscarUsuarioPorEmail(NodeUsuario* usuarios, char *email) {
+  if (usuarios == NULL) {
+    return NULL;
+  }
+  
+  buscarUsuarioPorEmail(usuarios->left, email);
+  buscarUsuarioPorEmail(usuarios->right, email);
+  if (!strcmp(email, usuarios->usuario.email)) {
+    printf("\nNome: %s\n", usuarios->usuario.nome);
+    printf("Email: %s\n", usuarios->usuario.email);
+  }
+  return !compString(usuarios->usuario.email, email) ? usuarios : NULL;
 }
 
 void consulta(Arvores *trees, int *codigo) {
@@ -333,50 +388,83 @@ void consulta(Arvores *trees, int *codigo) {
 
   switch (opcao) {
     case '1':
-      char busca;
+      char buscaLivro;
       printf("\n1. Por Código\n2. Por Autor\n0. Sair\n");
-      scanf(" %c", &busca);
+      scanf(" %c", &buscaLivro);
 
-      switch (busca) {
-        case '1':
-          int buscaCodigo;
-          printf("\nInforme o código do livro: ");
-          scanf("%d", &buscaCodigo);
+      switch (buscaLivro) {
+      case '1':
+        int buscaCodigo;
+        printf("\nInforme o código do livro: ");
+        scanf("%d", &buscaCodigo);
+        
+        NodeLivro *livroCod = buscarLivroPorCodigo(trees->livros, buscaCodigo);
+        if (livroCod == NULL) {
+          printf("\nLivro não encontrado.");
+        } else {
+          printf("\nTítulo: %s\n", livroCod->livro.titulo);
+          printf("Autor: %s\n", livroCod->livro.autor);
+          printf("Código: %d\n", livroCod->livro.codigo);
+          printf("Ano de Publicação: %d\n", livroCod->livro.anoPublicacao);
+          printf("Status (0: Disponível, 1: Emprestado): %d\n", livroCod->livro.status);
+        }
+        
+        break;
+      
+        case '2':
+          char buscaAutor[20];
+          printf("\nInforme o autor do livro: ");
+          scanf("%s", buscaAutor);
           
-          NodeLivro *livroCod = buscarLivroPorCodigo(trees->livros, buscaCodigo);
-          if (livroCod == NULL) {
+          NodeLivro *livroAut = buscarLivroPorAutor(trees->livros, buscaAutor);
+          if (livroAut == NULL) {
             printf("\nLivro não encontrado.");
-          } else {
-            printf("\nTítulo: %s\n", livroCod->livro.titulo);
-            printf("Autor: %s\n", livroCod->livro.autor);
-            printf("Código: %d\n", livroCod->livro.codigo);
-            printf("Ano de Publicação: %d\n", livroCod->livro.anoPublicacao);
-            printf("Status (0: Disponível, 1: Emprestado): %d\n", livroCod->livro.status);
           }
           
           break;
-        
-          case '2':
-            char buscaAutor[20];
-            printf("\nInforme o autor do livro: ");
-            scanf("%s", buscaAutor);
-            
-            NodeLivro *livroAut = buscarLivroPorAutor(trees->livros, buscaAutor);
-            if (livroAut == NULL) {
-              printf("\nLivro não encontrado.");
-            }
-            
-            break;
-          case '0':
-            return;
-            break;
-        
+        case '0':
+          return;
+          break;
+      
         default:
           break;
       }
 
       break;
+
     case '2':
+      char buscaUsuario;
+      printf("\n1. Por Email\n2. Por Nome\n0. Sair\n");
+      scanf(" %c", &buscaUsuario);
+
+      switch (buscaUsuario) {
+      case '1':
+        char buscaEmail[20];
+            printf("\nInforme o email do usuário: ");
+            scanf("%s", buscaEmail);
+            
+            NodeUsuario *usuarioEmail = buscarUsuarioPorEmail(trees->usuarios, buscaEmail);
+            if (usuarioEmail == NULL) {
+              printf("\nUsuário não encontrado.");
+            }
+        break;
+      case '2':
+        char buscaAutor[20];
+            printf("\nInforme o nome do usuário: ");
+            scanf("%s", buscaAutor);
+            
+            NodeUsuario *usuarioNome = buscarUsuarioPorNome(trees->usuarios, buscaAutor);
+            if (usuarioNome == NULL) {
+              printf("\nUsuário não encontrado.");
+            }
+        break;
+      case '0':
+        return;
+        break;
+      
+      default:
+        break;
+      }
 
       break;
     case '3':
