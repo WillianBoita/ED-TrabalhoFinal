@@ -15,6 +15,8 @@ typedef struct NodeLivro {
 
 Livro criarLivro(int *codigo);
 
+NodeLivro* inserirLivro(NodeLivro *rootLivro, Livro livro); 
+
 NodeLivro* buscarLivroPorCodigo(NodeLivro* livros, int codigo);
 
 // Implementação AVL, utilzado LLM
