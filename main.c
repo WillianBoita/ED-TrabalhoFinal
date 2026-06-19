@@ -249,6 +249,9 @@ void cadastro(Arvores *trees, int *codigo) {
       } else {
         trees->usuarios->left = nodeUsuario;
       }
+      break;
+    case '0':
+      return;
       break;  
     default:
       menu(trees, codigo);
@@ -290,13 +293,37 @@ Usuario criarUsuario() {
   return novoUsuario;
 }
 
-void listar(NodeLivro *raiz) {
-    if (raiz == NULL)
-        return;
+NodeLivro* buscarLivroPorCodigo(NodeLivro* livros, int codigo) {
+  if (livros == NULL) {
+    return livros;
+  }
+  
+  if(codigo < livros->livro.codigo){
+    return buscarLivroPorCodigo(livros->left, codigo);
+  }
 
-    listar(raiz->left);
-    printf("%d\n", raiz->livro.codigo);
-    listar(raiz->right);
+  if(codigo > livros->livro.codigo){
+    return buscarLivroPorCodigo(livros->right, codigo);
+  } 
+
+  return livros;
+}
+
+NodeLivro* buscarLivroPorAutor(NodeLivro* livros, char *autor) {
+  if (livros == NULL) {
+    return NULL;
+  }
+  
+  buscarLivroPorAutor(livros->left, autor);
+  buscarLivroPorAutor(livros->right, autor);
+  if (!strcmp(autor, livros->livro.autor)) {
+    printf("\nTítulo: %s\n", livros->livro.titulo);
+    printf("Autor: %s\n", livros->livro.autor);
+    printf("Código: %d\n", livros->livro.codigo);
+    printf("Ano de Publicação: %d\n", livros->livro.anoPublicacao);
+    printf("Status (0: Disponível, 1: Emprestado): %d\n", livros->livro.status);
+  }
+  return livros;
 }
 
 void consulta(Arvores *trees, int *codigo) {
@@ -311,32 +338,52 @@ void consulta(Arvores *trees, int *codigo) {
       scanf(" %c", &busca);
 
       switch (busca) {
-      case '1':
-        //listar(trees->livros);
-        int buscaCodigo;
-        printf("\ncódigo para buscar: ");
-        scanf("%d", &buscaCodigo);
+        case '1':
+          int buscaCodigo;
+          printf("\nInforme o código do livro: ");
+          scanf("%d", &buscaCodigo);
+          
+          NodeLivro *livroCod = buscarLivroPorCodigo(trees->livros, buscaCodigo);
+          if (livroCod == NULL) {
+            printf("\nLivro não encontrado.");
+          } else {
+            printf("\nTítulo: %s\n", livroCod->livro.titulo);
+            printf("Autor: %s\n", livroCod->livro.autor);
+            printf("Código: %d\n", livroCod->livro.codigo);
+            printf("Ano de Publicação: %d\n", livroCod->livro.anoPublicacao);
+            printf("Status (0: Disponível, 1: Emprestado): %d\n", livroCod->livro.status);
+          }
+          
+          break;
         
-        NodeLivro *livro = buscarLivroPorCodigo(trees->livros, buscaCodigo);
-        if (livro == NULL) {
-          printf("\nLivro não encontrado.");
-        } else {
-          printf("%s\n", livro->livro.titulo);
-          printf("%s\n", livro->livro.autor);
-          printf("%d\n", livro->livro.codigo);
-        }
+          case '2':
+            char buscaAutor[20];
+            printf("\nInforme o autor do livro: ");
+            scanf("%s", buscaAutor);
+            
+            NodeLivro *livroAut = buscarLivroPorAutor(trees->livros, buscaAutor);
+            if (livroAut == NULL) {
+              printf("\nLivro não encontrado.");
+            }
+            
+            break;
+          case '0':
+            return;
+            break;
         
-        break;
-      
-      default:
-        break;
+        default:
+          break;
       }
 
       break;
     case '2':
+
       break;
     case '3':
       
+      break;
+    case '0':
+      return;
       break;
     
     
@@ -346,22 +393,6 @@ void consulta(Arvores *trees, int *codigo) {
   }
 
   menu(trees, codigo);
-}
-
-NodeLivro* buscarLivroPorCodigo(NodeLivro* livros, int codigo) {
-  if (livros == NULL) {
-    return livros;
-  }
-  
-  if(codigo > livros->livro.codigo){
-    return buscarLivroPorCodigo(livros->right, codigo);
-  } 
-
-  if(codigo < livros->livro.codigo){
-    return buscarLivroPorCodigo(livros->left, codigo);
-  }
-
-  return livros;
 }
 
 void menu(Arvores *trees, int *codigo) {
@@ -388,7 +419,9 @@ void menu(Arvores *trees, int *codigo) {
     case '6':
       
       break;
-    
+    case '0':
+      return;
+      break;
     
     default:
       return;
