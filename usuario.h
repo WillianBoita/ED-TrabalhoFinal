@@ -10,13 +10,14 @@ typedef struct NodeUsuario {
 } NodeUsuario;
 
 Usuario criarUsuario();
+Usuario alterarUsuario(NodeUsuario *pessoa);
 
 NodeUsuario* inserirUsuario(NodeUsuario *rootUsuario, Usuario usuario);
 
 NodeUsuario* buscarUsuarioPorNome(NodeUsuario* usuarios, char *nome);
 NodeUsuario* buscarUsuarioPorEmail(NodeUsuario* usuarios, char *email);
 
-int compString(char* s1, char* s2);
+int compString(char* e1, char* e2);
 
 // Implementação AVL, utilzado LLM
 

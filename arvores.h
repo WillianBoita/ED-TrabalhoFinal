@@ -10,3 +10,5 @@ void menu(Arvores *trees, int *codigo);
 void cadastro(Arvores *trees, int *codigo);
 
 void consulta(Arvores *trees, int *codigo);
+
+void atualizacao(Arvores *trees, int *codigo);
