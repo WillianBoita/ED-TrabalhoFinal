@@ -19,6 +19,8 @@ NodeLivro* inserirLivro(NodeLivro *rootLivro, Livro livro);
 
 NodeLivro* buscarLivroPorCodigo(NodeLivro* livros, int codigo);
 NodeLivro* buscarLivroPorAutor(NodeLivro* livros, char *autor);
+NodeLivro* buscarLivrosDoUsuario(NodeLivro* livros, char *email);
+
 
 // Implementação AVL, utilzado LLM
 
