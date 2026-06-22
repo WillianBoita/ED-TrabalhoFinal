@@ -16,7 +16,7 @@ NodeUsuario* inserirUsuario(NodeUsuario *rootUsuario, Usuario usuario);
 NodeUsuario* buscarUsuarioPorNome(NodeUsuario* usuarios, char *nome);
 NodeUsuario* buscarUsuarioPorEmail(NodeUsuario* usuarios, char *email);
 
-int compString(char* e1, char* e2);
+int compString(char* s1, char* s2);
 
 // Implementação AVL, utilzado LLM
 

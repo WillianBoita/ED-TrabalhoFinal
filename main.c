@@ -203,6 +203,18 @@ NodeUsuario *balancearUsuario(NodeUsuario *raiz) {
 
 // Fim funções AVL
 
+int compString(char* s1, char* s2){
+  int flag = 0;
+  if (strcmp(s1, s2) != 0) return 1;
+  for (int i = 0; i < strlen(s1); i++) {
+    if (s1[i] != s2[i]) {
+      flag = 1;
+    }
+  }
+
+  return flag;
+}
+
 NodeLivro *inserirLivro(NodeLivro* rootLivro, Livro livro) {
   if (rootLivro == NULL){
     NodeLivro *nodeLivro = (NodeLivro*) malloc(sizeof(NodeLivro));
@@ -223,6 +235,28 @@ NodeLivro *inserirLivro(NodeLivro* rootLivro, Livro livro) {
   }
 
   return balancearLivro(rootLivro); //Balanceando árvore após adicionar livro novo, foi utilizado as funções AVL feitas por LLM
+}
+
+Livro criarLivro(int *codigo) {
+  Livro novoLivro;
+
+  printf("Informe o titulo do livro: ");
+  scanf("%s", novoLivro.titulo);
+
+  printf("Informe o autor do livro: ");
+  scanf("%s", novoLivro.autor);
+  
+  printf("Informe o ano de publicação do livro: ");
+  scanf("%d", &novoLivro.anoPublicacao);
+
+  novoLivro.status = 0;
+
+  strcpy(novoLivro.emailUsuario, "");
+
+  (*codigo)++;
+  novoLivro.codigo = *codigo;
+
+  return novoLivro;
 }
 
 NodeUsuario *inserirUsuario(NodeUsuario* rootUsuario, Usuario usuario) {
@@ -247,16 +281,16 @@ NodeUsuario *inserirUsuario(NodeUsuario* rootUsuario, Usuario usuario) {
   return balancearUsuario(rootUsuario); //Balanceando árvore após adicionar usuario novo, foi utilizado as funções AVL feitas por LLM
 }
 
-int compString(char* e1, char* e2){
-  int flag = 0;
-  if (strcmp(e1, e2) != 0) return 1;
-  for (int i = 0; i < strlen(e1); i++) {
-    if (e1[i] != e2[i]) {
-      flag = 1;
-    }
-  }
+Usuario criarUsuario() {
+  Usuario novoUsuario;
 
-  return flag;
+  printf("Informe o nome do Usuario: ");
+  scanf("%s", novoUsuario.nome);
+
+  printf("Informe o email do Usuario: ");
+  scanf("%s", novoUsuario.email);
+
+  return novoUsuario;
 }
 
 void cadastro(Arvores *trees, int *codigo) {
@@ -284,40 +318,6 @@ void cadastro(Arvores *trees, int *codigo) {
       menu(trees, codigo);
       break;
   }
-}
-
-Livro criarLivro(int *codigo) {
-  Livro novoLivro;
-
-  printf("Informe o titulo do livro: ");
-  scanf("%s", novoLivro.titulo);
-
-  printf("Informe o autor do livro: ");
-  scanf("%s", novoLivro.autor);
-  
-  printf("Informe o ano de publicação do livro: ");
-  scanf("%d", &novoLivro.anoPublicacao);
-
-  novoLivro.status = 0;
-
-  strcpy(novoLivro.emailUsuario, "");
-
-  (*codigo)++;
-  novoLivro.codigo = *codigo;
-
-  return novoLivro;
-}
-
-Usuario criarUsuario() {
-  Usuario novoUsuario;
-
-  printf("Informe o nome do Usuario: ");
-  scanf("%s", novoUsuario.nome);
-
-  printf("Informe o email do Usuario: ");
-  scanf("%s", novoUsuario.email);
-
-  return novoUsuario;
 }
 
 NodeLivro* buscarLivroPorCodigo(NodeLivro* livros, int codigo) {
@@ -379,6 +379,23 @@ NodeUsuario* buscarUsuarioPorEmail(NodeUsuario* usuarios, char *email) {
     printf("Email: %s\n", usuarios->usuario.email);
   }
   return !compString(usuarios->usuario.email, email) ? usuarios : NULL;
+}
+
+NodeLivro* buscarLivrosDoUsuario(NodeLivro* livros, char *email) {
+  if (livros == NULL) {
+    return NULL;
+  }
+  
+  buscarLivrosDoUsuario(livros->left, email);
+  buscarLivrosDoUsuario(livros->right, email);
+  if (!strcmp(email, livros->livro.emailUsuario)) {
+    printf("\nTítulo: %s\n", livros->livro.titulo);
+    printf("email: %s\n", livros->livro.emailUsuario);
+    printf("Código: %d\n", livros->livro.codigo);
+    printf("Ano de Publicação: %d\n", livros->livro.anoPublicacao);
+    printf("Status (0: Disponível, 1: Emprestado): %d\n", livros->livro.status);
+  }
+  return !compString(livros->livro.emailUsuario, email) ? livros : NULL;
 }
 
 void consulta(Arvores *trees, int *codigo) {
@@ -468,7 +485,13 @@ void consulta(Arvores *trees, int *codigo) {
 
       break;
     case '3':
-      
+      char buscaEmprestimo[30];
+      scanf("%s", buscaEmprestimo);
+      NodeUsuario *emprestimoEmail = buscarUsuarioPorEmail(trees->usuarios, buscaEmprestimo);
+      if (emprestimoEmail == NULL) {
+        printf("\nUsuário não encontrado.");
+      }
+
       break;
     case '0':
       return;
