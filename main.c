@@ -581,16 +581,59 @@ void atualizacao(Arvores *trees, int *codigo) {
   }
 }
 
-Usuario excluirUsuario(NodeUsuario *pessoa) {
-  Usuario usuarioExcluido;
+NodeUsuario *excluirUsuario(NodeUsuario *pessoa) {
+  
 
-  return usuarioExcluido;
+  return NULL;
 }
 
-Livro excluirLivro(NodeLivro *livros) {
-  Livro livroAlterado;
+NodeLivro *excluirLivro(NodeLivro *tree, int codigo) {
+  
+  if(tree == NULL) return NULL;
 
-  return livroAlterado;
+  printf("\nVisitando: %d", tree->livro.codigo);
+  
+  if(codigo < tree->livro.codigo) {
+    tree->left = excluirLivro(tree->left, codigo);
+  } else if(codigo > tree->livro.codigo) {
+    tree->right = excluirLivro(tree->right, codigo);
+  } else {
+    NodeLivro *sucessor = tree->right;
+    printf("\nENCONTROU ALVO: %d", tree->livro.codigo);
+  
+    if (tree->left == NULL && tree->right == NULL) {
+      free(tree);
+      printf("\nRemovido livro sem filhos");
+      return NULL;
+    }
+  
+    if (tree->left == NULL || tree->right == NULL) {
+      NodeLivro *filho = (tree->left != NULL) ? tree->left : tree->right;
+
+      free(tree);
+      printf("\nRemovido livro com um filho");
+      return filho;
+    }
+  
+    while (sucessor->left != NULL) {
+      sucessor = sucessor->left;
+    }
+
+    printf("\nSUCESSOR: %d", sucessor->livro.codigo);
+  
+    tree->livro = sucessor->livro;
+
+    printf("\nB.left = %p | B.right = %p", tree->left, tree->right);
+  
+    tree->right = excluirLivro(tree->right, sucessor->livro.codigo);
+  }
+
+  printf("\nRETORNANDO: %d", tree ? tree->livro.codigo : -1);
+
+  tree = balancearLivro(tree);
+
+  printf("\nRemovido livro com dois filhos");
+  return tree;
 }
 
 void excluir(Arvores *trees, int *codigo) {
@@ -604,13 +647,8 @@ void excluir(Arvores *trees, int *codigo) {
       int buscaCodigo;
       printf("\nInforme o código do livro: ");
       scanf("%d", &buscaCodigo);
-        
-      NodeLivro *livroCod = buscarLivroPorCodigo(trees->livros, buscaCodigo);
-      if (livroCod == NULL) {
-        printf("\nLivro não encontrado.");
-      } else {
-        excluirLivro(livroCod);
-      }
+
+      trees->livros = excluirLivro(trees->livros, buscaCodigo);
       break;
     case '2':
       char buscaEmail[20];
@@ -650,7 +688,7 @@ void menu(Arvores *trees, int *codigo) {
       atualizacao(trees, codigo);
       break;
     case '4':
-      
+      excluir(trees, codigo);
       break;
     case '5':
       

@@ -15,7 +15,8 @@ typedef struct NodeLivro {
 
 Livro criarLivro(int *codigo);
 Livro alterarLivro(NodeLivro *livro);
-Livro excluirLivro(NodeLivro *livro);
+
+NodeLivro* excluirLivro(NodeLivro *tree, int codigo);
 
 NodeLivro* inserirLivro(NodeLivro *rootLivro, Livro livro); 
 
