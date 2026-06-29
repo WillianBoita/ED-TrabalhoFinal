@@ -14,3 +14,7 @@ void consulta(Arvores *trees, int *codigo);
 void atualizacao(Arvores *trees, int *codigo);
 
 void excluir(Arvores *trees, int *codigo);
+
+void emprestar(Arvores *trees, int *codigo);
+
+void devolver(Arvores *trees, int *codigo);

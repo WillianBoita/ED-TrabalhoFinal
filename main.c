@@ -382,6 +382,21 @@ NodeUsuario* buscarUsuarioPorEmail(NodeUsuario* usuarios, char *email) {
   return !compString(usuarios->usuario.email, email) ? usuarios : NULL;
 }
 
+void listarLivrosUsuario(NodeLivro *tree, char *email) {
+    if (tree == NULL)
+        return;
+
+    listarLivrosUsuario(tree->left, email);
+
+    if (strcmp(tree->livro.emailUsuario, email) == 0) {
+        printf("\nCódigo: %d", tree->livro.codigo);
+        printf("\nTítulo: %s", tree->livro.titulo);
+        printf("\nAutor: %s\n", tree->livro.autor);
+    }
+
+    listarLivrosUsuario(tree->right, email);
+}
+
 void consulta(Arvores *trees, int *codigo) {
   char opcao;
   printf("\n-------------\n");
@@ -472,7 +487,21 @@ void consulta(Arvores *trees, int *codigo) {
 
       break;
     case '3':
-      
+      char buscaEmail[20];
+
+      printf("\nInforme o email do usuário: ");
+      scanf("%s", buscaEmail);
+
+      NodeUsuario *usuario = buscarUsuarioPorEmail(trees->usuarios, buscaEmail);
+
+      if (usuario == NULL) {
+        printf("\nUsuário não encontrado.");
+        break;
+      }
+
+      printf("\nLivros em posse de %s:\n", usuario->usuario.nome);
+
+      listarLivrosUsuario(trees->livros, buscaEmail);
       break;
     case '0':
       return;
@@ -694,6 +723,85 @@ void excluir(Arvores *trees, int *codigo) {
   }
 }
 
+NodeLivro *emprestarLivro(NodeLivro *tree, int codigo) {
+  if (tree == NULL) {
+    printf("\nLivro não encontrado.");
+    return NULL;
+  }
+
+  NodeLivro *livroCod = buscarLivroPorCodigo(tree, codigo);
+
+  if (livroCod->livro.status == 1) {
+    printf("Este livro já está emprestado.");
+    return NULL;
+  } else {
+    livroCod->livro.status = 1;
+    return tree;
+  }
+  return tree;
+}
+
+void emprestar(Arvores *trees, int *codigo) {
+  int buscaCodigo;
+  printf("\n-------------\n");
+  printf("\nInforme o código do livro: ");
+  scanf("%d", &buscaCodigo);
+
+  char buscaEmail[20];
+  printf("\nInforme o email do usuário: ");
+  scanf("%s", buscaEmail);
+            
+  NodeUsuario *usuarioEmail = buscarUsuarioPorEmail(trees->usuarios, buscaEmail);
+
+  if(usuarioEmail == NULL) {
+    printf("\nUsuário não encontrado.");
+    return;
+  }
+
+  trees->livros = emprestarLivro(trees->livros, buscaCodigo);
+
+  NodeLivro *livro = buscarLivroPorCodigo(trees->livros, buscaCodigo);
+
+  if (livro != NULL && livro->livro.status == 1) {
+    strcpy(livro->livro.emailUsuario, buscaEmail);
+  }
+}
+
+NodeLivro *devolverLivro(NodeLivro *tree, int codigo) {
+    if (tree == NULL) {
+        printf("\nLivro não encontrado.");
+        return tree;
+    }
+
+    NodeLivro *livroCod = buscarLivroPorCodigo(tree, codigo);
+
+    if (livroCod == NULL) {
+        printf("\nLivro não encontrado.");
+        return tree;
+    }
+
+    if (livroCod->livro.status == 0) {
+        printf("\nEste livro já está disponível.");
+        return tree;
+    }
+
+    livroCod->livro.status = 0;
+    strcpy(livroCod->livro.emailUsuario, "");
+
+    printf("\nLivro devolvido com sucesso!");
+
+    return tree;
+}
+
+void devolver(Arvores *trees, int *codigo) {
+  int buscaCodigo;
+
+  printf("\nInforme o código do livro: ");
+  scanf("%d", &buscaCodigo);
+
+  trees->livros = devolverLivro(trees->livros, buscaCodigo);
+}
+
 void menu(Arvores *trees, int *codigo) {
   char opcao;
   printf("\n-------------\n");
@@ -714,10 +822,10 @@ void menu(Arvores *trees, int *codigo) {
       excluir(trees, codigo);
       break;
     case '5':
-      
+      emprestar(trees, codigo);
       break;
     case '6':
-      
+      devolver(trees, codigo);
       break;
     case '0':
       return;

@@ -20,8 +20,14 @@ NodeLivro* excluirLivro(NodeLivro *tree, int codigo);
 
 NodeLivro* inserirLivro(NodeLivro *rootLivro, Livro livro); 
 
+NodeLivro* emprestarLivro(NodeLivro *tree, int codigo);
+
+NodeLivro* devolverLivro(NodeLivro* tree, int codigo);
+
 NodeLivro* buscarLivroPorCodigo(NodeLivro* livros, int codigo);
 NodeLivro* buscarLivroPorAutor(NodeLivro* livros, char *autor);
+
+void listarLivrosUsuario(NodeLivro *tree, char *email);
 
 // Implementação AVL, utilzado LLM
 
