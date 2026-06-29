@@ -803,49 +803,66 @@ void devolver(Arvores *trees, int *codigo) {
 }
 
 void menu(Arvores *trees, int *codigo) {
-  char opcao;
-  printf("\n-------------\n");
-  printf("\n1. Cadastro\n2. Consulta\n3. Atualização\n4. Exclusão\n5. Empréstimo\n6. Devolução\n0. Sair\n");
-  scanf(" %c", &opcao);
+    char opcao;
 
-  switch (opcao) {
-    case '1':
-      cadastro(trees, codigo);
-      break;
-    case '2':
-      consulta(trees, codigo);
-      break;
-    case '3':
-      atualizacao(trees, codigo);
-      break;
-    case '4':
-      excluir(trees, codigo);
-      break;
-    case '5':
-      emprestar(trees, codigo);
-      break;
-    case '6':
-      devolver(trees, codigo);
-      break;
-    case '0':
-      return;
-      break;
-    
-    default:
-      return;
-      break;
-  }
+    do {
+        printf("\n-------------\n");
+        printf("\n1. Cadastro");
+        printf("\n2. Consulta");
+        printf("\n3. Atualização");
+        printf("\n4. Exclusão");
+        printf("\n5. Empréstimo");
+        printf("\n6. Devolução");
+        printf("\n0. Sair\n");
 
-  menu(trees, codigo);
+        scanf(" %c", &opcao);
+
+        switch (opcao) {
+            case '1':
+                cadastro(trees, codigo);
+                break;
+
+            case '2':
+                consulta(trees, codigo);
+                break;
+
+            case '3':
+                atualizacao(trees, codigo);
+                break;
+
+            case '4':
+                excluir(trees, codigo);
+                break;
+
+            case '5':
+                emprestar(trees, codigo);
+                break;
+
+            case '6':
+                devolver(trees, codigo);
+                break;
+
+            case '0':
+                printf("\nPrograma encerrado.\n");
+                break;
+
+            default:
+                printf("\nOpção inválida.\n");
+        }
+
+    } while (opcao != '0');
 }
 
 int main() {
-  Arvores *trees = (Arvores*) malloc(sizeof(Arvores));
-  int codigo = 0;
+    Arvores *trees = malloc(sizeof(Arvores));
+    int codigo = 0;
 
-  trees->livros = NULL;
-  trees->usuarios = NULL;
+    trees->livros = NULL;
+    trees->usuarios = NULL;
 
-  menu(trees, &codigo);
-  return 0;
+    menu(trees, &codigo);
+
+    free(trees);
+
+    return 0;
 }
