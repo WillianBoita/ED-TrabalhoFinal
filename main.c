@@ -449,7 +449,7 @@ void consulta(Arvores *trees, int *codigo) {
             
             NodeUsuario *usuarioEmail = buscarUsuarioPorEmail(trees->usuarios, buscaEmail);
             if (usuarioEmail == NULL) {
-              printf("\nUsuário não encontrado.");
+              printf("\nUsuário não cadastrado.");
             }
         break;
       case '2':
@@ -459,7 +459,7 @@ void consulta(Arvores *trees, int *codigo) {
             
             NodeUsuario *usuarioNome = buscarUsuarioPorNome(trees->usuarios, buscaAutor);
             if (usuarioNome == NULL) {
-              printf("\nUsuário não encontrado.");
+              printf("\nUsuário não cadastrado.");
             }
         break;
       case '0':
@@ -581,29 +581,65 @@ void atualizacao(Arvores *trees, int *codigo) {
   }
 }
 
-NodeUsuario *excluirUsuario(NodeUsuario *pessoa) {
+NodeUsuario *excluirUsuario(NodeUsuario *pessoa, char *email) {
   
+  if(pessoa == NULL) {
+    printf("\nUsuário não cadastrado.");
+    return NULL;
+  }
 
-  return NULL;
+  int cmp = strcmp(email, pessoa->usuario.email);
+
+  if(cmp < 0) {
+    pessoa->left = excluirUsuario(pessoa->left, email);
+  } else if(cmp > 0) {
+    pessoa->right = excluirUsuario(pessoa->right, email);
+  } else {
+    NodeUsuario *sucessor = pessoa->right;
+  
+    if (pessoa->left == NULL && pessoa->right == NULL) {
+      free(pessoa);
+      printf("\nUsuário excluido com sucesso.");
+      return NULL;
+    }
+  
+    if (pessoa->left == NULL || pessoa->right == NULL) {
+      NodeUsuario *filho = (pessoa->left != NULL) ? pessoa->left : pessoa->right;
+
+      free(pessoa);
+      printf("\nUsuário excluido com sucesso.");
+      return filho;
+    }
+  
+    while (sucessor->left != NULL) {
+      sucessor = sucessor->left;
+    }
+  
+    pessoa->usuario = sucessor->usuario;
+  
+    pessoa->right = excluirUsuario(pessoa->right, sucessor->usuario.email);
+  }
+
+  pessoa = balancearUsuario(pessoa); //Balanceando árvore após excluir usuario, foi utilizado as funções AVL feitas por LLM
+  return pessoa;
 }
 
 NodeLivro *excluirLivro(NodeLivro *tree, int codigo) {
   
-  if(tree == NULL) return NULL;
-
-  printf("\nVisitando: %d", tree->livro.codigo);
-  
+  if(tree == NULL) {
+    printf("Livro não encontrado.");
+    return NULL;
+  }
   if(codigo < tree->livro.codigo) {
     tree->left = excluirLivro(tree->left, codigo);
   } else if(codigo > tree->livro.codigo) {
     tree->right = excluirLivro(tree->right, codigo);
   } else {
     NodeLivro *sucessor = tree->right;
-    printf("\nENCONTROU ALVO: %d", tree->livro.codigo);
   
     if (tree->left == NULL && tree->right == NULL) {
       free(tree);
-      printf("\nRemovido livro sem filhos");
+      printf("\nLivro excluido com sucesso.");
       return NULL;
     }
   
@@ -611,28 +647,20 @@ NodeLivro *excluirLivro(NodeLivro *tree, int codigo) {
       NodeLivro *filho = (tree->left != NULL) ? tree->left : tree->right;
 
       free(tree);
-      printf("\nRemovido livro com um filho");
+      printf("\nLivro excluido com sucesso.");
       return filho;
     }
   
     while (sucessor->left != NULL) {
       sucessor = sucessor->left;
     }
-
-    printf("\nSUCESSOR: %d", sucessor->livro.codigo);
   
     tree->livro = sucessor->livro;
-
-    printf("\nB.left = %p | B.right = %p", tree->left, tree->right);
   
     tree->right = excluirLivro(tree->right, sucessor->livro.codigo);
   }
 
-  printf("\nRETORNANDO: %d", tree ? tree->livro.codigo : -1);
-
-  tree = balancearLivro(tree);
-
-  printf("\nRemovido livro com dois filhos");
+  tree = balancearLivro(tree); //Balanceando árvore após excluir livro, foi utilizado as funções AVL feitas por LLM
   return tree;
 }
 
@@ -654,13 +682,8 @@ void excluir(Arvores *trees, int *codigo) {
       char buscaEmail[20];
       printf("\nInforme o email do usuário: ");
       scanf("%s", buscaEmail);
-            
-      NodeUsuario *usuarioEmail = buscarUsuarioPorEmail(trees->usuarios, buscaEmail);
-      if (usuarioEmail == NULL) {
-        printf("\nUsuário não encontrado.");
-      } else {
-        excluirUsuario(usuarioEmail);
-      }
+      
+      trees->usuarios = excluirUsuario(trees->usuarios, buscaEmail);
       break;
     case '0':
       return;
