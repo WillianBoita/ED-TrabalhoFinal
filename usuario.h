@@ -12,6 +12,8 @@ typedef struct NodeUsuario {
 Usuario criarUsuario();
 Usuario alterarUsuario(NodeUsuario *pessoa);
 
+NodeUsuario* excluirUsuario(NodeUsuario *pessoa, char *email);
+
 NodeUsuario* inserirUsuario(NodeUsuario *rootUsuario, Usuario usuario);
 
 NodeUsuario* buscarUsuarioPorNome(NodeUsuario* usuarios, char *nome);
