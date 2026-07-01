@@ -203,6 +203,7 @@ NodeUsuario *balancearUsuario(NodeUsuario *raiz) {
 
 // Fim funções AVL
 
+// Inserindo Livro na árvore, menor para a esquerda e maior para a direita
 NodeLivro *inserirLivro(NodeLivro* rootLivro, Livro livro) {
   if (rootLivro == NULL){
     NodeLivro *nodeLivro = (NodeLivro*) malloc(sizeof(NodeLivro));
@@ -225,6 +226,7 @@ NodeLivro *inserirLivro(NodeLivro* rootLivro, Livro livro) {
   return balancearLivro(rootLivro); //Balanceando árvore após adicionar livro novo, foi utilizado as funções AVL feitas por LLM
 }
 
+// Inserindo usuário na árvore, email menor para a esquerda, email maior para a direita
 NodeUsuario *inserirUsuario(NodeUsuario* rootUsuario, Usuario usuario) {
   if (rootUsuario == NULL){
     NodeUsuario *nodeUsuario = (NodeUsuario*) malloc(sizeof(NodeUsuario));
@@ -236,7 +238,7 @@ NodeUsuario *inserirUsuario(NodeUsuario* rootUsuario, Usuario usuario) {
 
     rootUsuario = nodeUsuario;
 
-  } else if(strcmp(rootUsuario->usuario.email, usuario.email) <= 0){
+  } else if(strcmp(rootUsuario->usuario.email, usuario.email) < 0){
     rootUsuario->right = inserirUsuario(rootUsuario->right, usuario);
   } else if(strcmp(rootUsuario->usuario.email, usuario.email) > 0){
     rootUsuario->left = inserirUsuario(rootUsuario->left, usuario);
@@ -245,18 +247,6 @@ NodeUsuario *inserirUsuario(NodeUsuario* rootUsuario, Usuario usuario) {
   }
 
   return balancearUsuario(rootUsuario); //Balanceando árvore após adicionar usuario novo, foi utilizado as funções AVL feitas por LLM
-}
-
-int compString(char* e1, char* e2){
-  int flag = 0;
-  if (strcmp(e1, e2) != 0) return 1;
-  for (int i = 0; i < strlen(e1); i++) {
-    if (e1[i] != e2[i]) {
-      flag = 1;
-    }
-  }
-
-  return flag;
 }
 
 void cadastro(Arvores *trees, int *codigo) {
@@ -303,6 +293,7 @@ Livro criarLivro(int *codigo) {
 
   strcpy(novoLivro.emailUsuario, "");
 
+  // adiciona 1 para a variável "global" código e atribui ao usuário
   (*codigo)++;
   novoLivro.codigo = *codigo;
 
@@ -321,6 +312,7 @@ Usuario criarUsuario() {
   return novoUsuario;
 }
 
+// Busca recursiva de livros por código
 NodeLivro* buscarLivroPorCodigo(NodeLivro* livros, int codigo) {
   if (livros == NULL) {
     return livros;
@@ -337,11 +329,13 @@ NodeLivro* buscarLivroPorCodigo(NodeLivro* livros, int codigo) {
   return livros;
 }
 
+// Busca recursiva de livros por autor, pre-Order
 NodeLivro* buscarLivroPorAutor(NodeLivro* livros, char *autor) {
   if (livros == NULL) {
     return NULL;
   }
 
+  // Se o valor for 0, significa que as strings são iguais, logo achamos o livro do autor
   if (!strcmp(autor, livros->livro.autor)) {
     return livros;
   }
@@ -353,11 +347,13 @@ NodeLivro* buscarLivroPorAutor(NodeLivro* livros, char *autor) {
   return buscarLivroPorAutor(livros->right, autor);
 }
 
+// Busca recursiva de usuários por nome, pre-Order
 NodeUsuario* buscarUsuarioPorNome(NodeUsuario* usuarios, char *nome) {
   if (usuarios == NULL) {
     return NULL;
   }
 
+  // Se o valor for 0, significa que as strings são iguais, logo achamos o usuário
   if (!strcmp(nome, usuarios->usuario.nome)) {
     return usuarios;
   }
@@ -901,9 +897,9 @@ int main() {
     trees->livros = NULL;
     trees->usuarios = NULL;
 
-    menu(trees, &codigo);
+    menu(trees, &codigo); // passando a referência de código, assim utilizando a mesma variável e sendo uma forma de variável "global"
 
-    free(trees);
+    free(trees); // liberando a memória e finalizando o programa
 
     return 0;
 }
