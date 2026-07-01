@@ -428,6 +428,7 @@ void consulta(Arvores *trees, int *codigo) {
           printf("Código: %d\n", livroCod->livro.codigo);
           printf("Ano de Publicação: %d\n", livroCod->livro.anoPublicacao);
           printf("Status (0: Disponível, 1: Emprestado): %d\n", livroCod->livro.status);
+          if (livroCod->livro.status == 1) printf("Emprestado para: %s\n", livroCod->livro.emailUsuario);
         }
         
         break;
@@ -446,6 +447,7 @@ void consulta(Arvores *trees, int *codigo) {
             printf("Código: %d\n", livroAut->livro.codigo);
             printf("Ano de Publicação: %d\n", livroAut->livro.anoPublicacao);
             printf("Status (0: Disponível, 1: Emprestado): %d\n", livroAut->livro.status);
+            if (livroAut->livro.status == 1) printf("Emprestado para: %s\n", livroAut->livro.emailUsuario);
           }
           
           break;
@@ -556,7 +558,7 @@ Livro alterarLivro(NodeLivro *livros) {
     printf("\nTítulo não alterado.");
   }
 
-  printf("Deseja alterar o autor do livro? (S/N) ");
+  printf("\nDeseja alterar o autor do livro? (S/N) ");
   scanf(" %c", &opcao);
 
   if (opcao == 's') {
@@ -568,7 +570,7 @@ Livro alterarLivro(NodeLivro *livros) {
     printf("\nAutor não alterado.");
   }
 
-  printf("Deseja alterar o ano do livro? (S/N) ");
+  printf("\nDeseja alterar o ano do livro? (S/N) ");
   scanf(" %c", &opcao);
 
   if (opcao == 's') {
@@ -672,6 +674,12 @@ NodeLivro *excluirLivro(NodeLivro *tree, int codigo) {
     printf("Livro não encontrado.");
     return NULL;
   }
+
+  if(tree->livro.status == 1) {
+    printf("Este livro está emprestado e não pode ser excluido.");
+    return tree;
+  }
+
   if(codigo < tree->livro.codigo) {
     tree->left = excluirLivro(tree->left, codigo);
   } else if(codigo > tree->livro.codigo) {
@@ -759,10 +767,11 @@ NodeLivro *emprestarLivro(NodeLivro *tree, int codigo) {
   NodeLivro *livroCod = buscarLivroPorCodigo(tree, codigo);
 
   if (livroCod->livro.status == 1) {
-    printf("Este livro já está emprestado.");
+    printf("\nEste livro já está emprestado.");
     return NULL;
   } else {
     livroCod->livro.status = 1;
+    printf("\nEmpréstimo realizado com sucesso.");
     return tree;
   }
   return tree;
