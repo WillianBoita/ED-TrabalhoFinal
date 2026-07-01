@@ -385,6 +385,7 @@ NodeUsuario* buscarUsuarioPorEmail(NodeUsuario* usuarios, char *email) {
   return buscarUsuarioPorEmail(usuarios->right, email);
 }
 
+// função que faz o percurso in-order em todos os nós pra retornar os livros do usuário
 void listarLivrosUsuario(NodeLivro *tree, char *email) {
     if (tree == NULL)
         return;
@@ -634,12 +635,13 @@ NodeUsuario *excluirUsuario(NodeUsuario *pessoa, char *email) {
 
   int cmp = strcmp(email, pessoa->usuario.email);
 
+  // busca o usuário na árvore
   if(cmp < 0) {
     pessoa->left = excluirUsuario(pessoa->left, email);
   } else if(cmp > 0) {
     pessoa->right = excluirUsuario(pessoa->right, email);
   } else {
-    NodeUsuario *sucessor = pessoa->right;
+    NodeUsuario *sucessor = pessoa->right; //prepara o sucessor caso o nó possua dois filhos
   
     if (pessoa->left == NULL && pessoa->right == NULL) {
       free(pessoa);
@@ -657,11 +659,11 @@ NodeUsuario *excluirUsuario(NodeUsuario *pessoa, char *email) {
   
     while (sucessor->left != NULL) {
       sucessor = sucessor->left;
-    }
+    } // localiza o sucessor
   
     pessoa->usuario = sucessor->usuario;
   
-    pessoa->right = excluirUsuario(pessoa->right, sucessor->usuario.email);
+    pessoa->right = excluirUsuario(pessoa->right, sucessor->usuario.email); //remove o sucessor original para não duplicar o usuário
   }
 
   pessoa = balancearUsuario(pessoa); //Balanceando árvore após excluir usuario, foi utilizado as funções AVL feitas por LLM
@@ -680,12 +682,13 @@ NodeLivro *excluirLivro(NodeLivro *tree, int codigo) {
     return tree;
   }
 
+  // busca o livro na árvore
   if(codigo < tree->livro.codigo) {
     tree->left = excluirLivro(tree->left, codigo);
   } else if(codigo > tree->livro.codigo) {
     tree->right = excluirLivro(tree->right, codigo);
   } else {
-    NodeLivro *sucessor = tree->right;
+    NodeLivro *sucessor = tree->right; // prepara o sucessor caso o nó tenha dois filhos
   
     if (tree->left == NULL && tree->right == NULL) {
       free(tree);
@@ -703,11 +706,11 @@ NodeLivro *excluirLivro(NodeLivro *tree, int codigo) {
   
     while (sucessor->left != NULL) {
       sucessor = sucessor->left;
-    }
+    } // localiza o sucessor
   
     tree->livro = sucessor->livro;
   
-    tree->right = excluirLivro(tree->right, sucessor->livro.codigo);
+    tree->right = excluirLivro(tree->right, sucessor->livro.codigo); // exclui o sucessor original para não duplicar os livros
   }
 
   tree = balancearLivro(tree); //Balanceando árvore após excluir livro, foi utilizado as funções AVL feitas por LLM
@@ -715,6 +718,7 @@ NodeLivro *excluirLivro(NodeLivro *tree, int codigo) {
 }
 
 int possuiLivrosEmprestados(NodeLivro *tree, char *email) {
+  // verifica se o usuário possui livros em posse
     if (tree == NULL)
       return 0;
 
@@ -800,7 +804,7 @@ void emprestar(Arvores *trees, int *codigo) {
 
   if (livro != NULL && livro->livro.status == 1) {
     strcpy(livro->livro.emailUsuario, buscaEmail);
-  }
+  } // altera o email no livro para o email do usuário
 }
 
 NodeLivro *devolverLivro(NodeLivro *tree, int codigo) {
@@ -841,6 +845,7 @@ void devolver(Arvores *trees, int *codigo) {
 void menu(Arvores *trees, int *codigo) {
     char opcao;
 
+    // menu em do while para evitar stack overflow de chamadas recursivas
     do {
         printf("\n-------------\n");
         printf("\n1. Cadastro");
